@@ -66,6 +66,8 @@ class Booking:
         Retrieves all seats for the showtime's hall along with live status:
         'AVAILABLE', 'SELECTED' (by current_session_id), 'HELD' (by another session), or 'BOOKED'.
         """
+        showtime_id = int(showtime_id)
+
         # Fetch showtime to get hall_id
         st_query = "SELECT hall_id FROM showtimes WHERE id = ?;"
         st = execute_query(st_query, (showtime_id,), fetchone=True)
@@ -93,12 +95,13 @@ class Booking:
             WHERE b.showtime_id = ? AND b.booking_status != 'CANCELLED';
         """
         booked_res = execute_query(booked_query, (showtime_id,), fetchall=True)
-        booked_seat_ids = set(r['seat_id'] for r in booked_res)
+        booked_seat_ids = set(int(r['seat_id']) for r in booked_res)
 
         # Clean expired holds first
-        clean_holds_query = "DELETE FROM seat_holds WHERE expires_at <= NOW();"
+        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        clean_holds_query = "DELETE FROM seat_holds WHERE expires_at <= ?;"
         try:
-            execute_query(clean_holds_query, commit=True)
+            execute_query(clean_holds_query, (now_str,), commit=True)
         except Exception:
             pass
 
@@ -106,10 +109,10 @@ class Booking:
         holds_query = """
             SELECT seat_id, session_id, expires_at
             FROM seat_holds
-            WHERE showtime_id = ? AND expires_at > NOW();
+            WHERE showtime_id = ? AND expires_at > ?;
         """
-        holds_res = execute_query(holds_query, (showtime_id,), fetchall=True)
-        holds_map = {h['seat_id']: h for h in holds_res}
+        holds_res = execute_query(holds_query, (showtime_id, now_str), fetchall=True)
+        holds_map = {int(h['seat_id']): h for h in holds_res}
 
         # Build seat status list
         result = []

@@ -16,6 +16,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const showtimeId = document.getElementById('showtimeId')?.value;
     const timerDisplay = document.getElementById('timerDisplay');
 
+    // Live seat map polling every 3 seconds
+    if (showtimeId) {
+        setInterval(() => {
+            fetch(`/api/showtimes/${showtimeId}/seats`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.seats) {
+                        syncCustomerSeatMap(data.seats);
+                    }
+                })
+                .catch(err => console.error("Seat Map Poll Error:", err));
+        }, 3000);
+    }
+
+    function syncCustomerSeatMap(seats) {
+        seats.forEach(s => {
+            const btn = document.querySelector(`.seat-btn[data-seat-id="${s.seat_id}"]`);
+            if (btn && !btn.classList.contains('selected')) {
+                if (s.status === 'BOOKED') {
+                    btn.className = 'seat-btn booked';
+                    btn.disabled = true;
+                } else if (s.status === 'HELD') {
+                    btn.className = 'seat-btn held';
+                    btn.disabled = true;
+                } else if (s.status === 'AVAILABLE') {
+                    const isVip = btn.classList.contains('seat-vip') || (btn.title && btn.title.includes('VIP'));
+                    btn.className = isVip ? 'seat-btn seat-vip' : 'seat-btn';
+                    btn.disabled = false;
+                }
+            }
+        });
+    }
+
     seatGrid.addEventListener('click', (e) => {
         const btn = e.target.closest('.seat-btn');
         if (!btn || btn.classList.contains('booked') || btn.classList.contains('held')) return;

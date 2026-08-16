@@ -22,6 +22,9 @@ class BookingService:
         if not seat_ids:
             return {'success': False, 'message': 'No seats selected.'}
 
+        showtime_id = int(showtime_id)
+        seat_ids = [int(s) for s in seat_ids]
+
         conn = get_db_connection()
         is_sqlite = Config.DB_TYPE != 'mysql'
         cursor = conn.cursor()
@@ -110,6 +113,9 @@ class BookingService:
         """
         if not seat_ids:
             return {'success': False, 'message': 'No seats selected.'}
+
+        showtime_id = int(showtime_id)
+        seat_ids = [int(s) for s in seat_ids]
 
         conn = get_db_connection()
         is_sqlite = Config.DB_TYPE != 'mysql'
