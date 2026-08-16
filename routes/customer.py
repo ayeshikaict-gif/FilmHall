@@ -10,6 +10,10 @@ from routes.auth import login_required
 
 customer_bp = Blueprint('customer', __name__)
 
+@customer_bp.before_request
+def auto_sync_showtime_dates():
+    Showtime.sync_dynamic_showtimes()
+
 def get_session_id():
     if 'session_token' not in session:
         session['session_token'] = str(uuid.uuid4())
