@@ -58,8 +58,11 @@ class Movie:
 
     @staticmethod
     def soft_delete(movie_id):
-        query = "UPDATE movies SET is_deleted = 1 WHERE id = ?;"
-        return execute_query(query, (movie_id,), commit=True)
+        query = "UPDATE movies SET is_deleted = 1, status = 'ENDED' WHERE id = ?;"
+        execute_query(query, (movie_id,), commit=True)
+        # Deactivate all active showtimes for archived movie
+        execute_query("UPDATE showtimes SET is_active = 0 WHERE movie_id = ?;", (movie_id,), commit=True)
+        return True
 
     @staticmethod
     def get_sinhala_movies():
@@ -67,5 +70,5 @@ class Movie:
 
     @staticmethod
     def get_international_movies():
-        query = "SELECT * FROM movies WHERE is_deleted = 0 AND LOWER(language) != 'sinhala' AND status = 'NOW SHOWING' ORDER BY release_date DESC;"
+        query = "SELECT * FROM movies WHERE is_deleted = 0 AND status = 'NOW SHOWING' AND LOWER(language) != 'sinhala' ORDER BY release_date DESC;"
         return execute_query(query, fetchall=True)

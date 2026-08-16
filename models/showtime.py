@@ -102,7 +102,7 @@ class Showtime:
     def get_all(show_date=None, hall_id=None, include_past=False):
         Showtime.sync_dynamic_showtimes()
         import datetime
-        where_clauses = ["st.is_active = 1"]
+        where_clauses = ["st.is_active = 1", "m.is_deleted = 0", "m.status = 'NOW SHOWING'"]
         params = []
 
         if show_date:
