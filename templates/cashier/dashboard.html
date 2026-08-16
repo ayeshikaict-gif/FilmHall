@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cashier.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="section-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h1 class="section-title"><i class="fa-solid fa-cash-register" style="color: var(--gold);"></i> Cashier POS Ticket Counter Desk</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 5px;">Issue walk-in cash tickets, print passes, and manage live hall availability.</p>
+        </div>
+    </div>
+
+    <!-- Active Showtimes Picker Grid -->
+    <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 2.5rem;">
+        <h3 style="color: var(--gold); font-size: 1.1rem; margin-bottom: 1.2rem;"><i class="fa-regular fa-clock"></i> Select Showtime to Open POS Counter Grid</h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.2rem;">
+            {% for st in showtimes %}
+                <div style="background: var(--bg-surface); padding: 1.2rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="font-weight: 700; color: var(--text-primary); font-size: 1.05rem;">{{ st.movie_title }}</div>
+                        <div style="font-size: 0.85rem; color: var(--gold); margin-top: 4px;">{{ st.hall_name }}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">Date: {{ st.show_date }} at {{ st.start_time[:5] }}</div>
+                    </div>
+                    <a href="{{ url_for('cashier.pos_booking', showtime_id=st.id) }}" class="btn-primary" style="margin-top: 1rem; text-align: center; font-size: 0.85rem; padding: 0.5rem;">
+                        <i class="fa-solid fa-couch"></i> Open POS Seat Map
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recent Cashier Bookings Table -->
+    <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+        <h3 style="color: var(--gold); font-size: 1.1rem; margin-bottom: 1rem;"><i class="fa-solid fa-list-check"></i> Recent Walk-In & Online Bookings Register</h3>
+
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+            <thead>
+                <tr style="background: var(--bg-surface); color: var(--gold);">
+                    <th style="padding: 10px;">Ref ID</th>
+                    <th style="padding: 10px;">Customer</th>
+                    <th style="padding: 10px;">Movie</th>
+                    <th style="padding: 10px;">Hall / Seats</th>
+                    <th style="padding: 10px;">Amount</th>
+                    <th style="padding: 10px;">Source</th>
+                    <th style="padding: 10px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in recent_bookings %}
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 10px; font-weight: bold;">{{ b.booking_ref }}</td>
+                        <td style="padding: 10px;">{{ b.customer_name }} ({{ b.customer_phone }})</td>
+                        <td style="padding: 10px;">{{ b.movie_title }}</td>
+                        <td style="padding: 10px;">{{ b.hall_name }} - {{ b.seats_str }}</td>
+                        <td style="padding: 10px; color: var(--gold); font-weight: bold;">Rs. {{ "%.2f"|format(b.total_amount_lkr | float) }}</td>
+                        <td style="padding: 10px;">
+                            <span style="background: {% if b.booking_source == 'CASHIER' %}#431407{% else %}#0C4A6E{% endif %}; color: {% if b.booking_source == 'CASHIER' %}#FDBA74{% else %}#7DD3FC{% endif %}; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">
+                                {{ b.booking_source }}
+                            </span>
+                        </td>
+                        <td style="padding: 10px;">
+                            <a href="{{ url_for('api.download_ticket_pdf', booking_id=b.id) }}" target="_blank" class="btn-outline" style="padding: 2px 8px; font-size: 0.75rem;">
+                                <i class="fa-solid fa-print"></i> Print
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

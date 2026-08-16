@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+        <ul class="sidebar-menu">
+            <li class="sidebar-item"><a href="{{ url_for('admin.dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.movies') }}"><i class="fa-solid fa-film"></i> Movies Management</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.showtimes') }}"><i class="fa-regular fa-calendar-days"></i> Showtimes Schedule</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.halls') }}"><i class="fa-solid fa-couch"></i> Halls & Pricing</a></li>
+            <li class="sidebar-item active"><a href="{{ url_for('admin.bookings') }}"><i class="fa-solid fa-ticket"></i> Master Bookings</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.users') }}"><i class="fa-solid fa-users"></i> Users & Roles</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.reports') }}"><i class="fa-solid fa-chart-pie"></i> Sales Reports</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.audit_logs') }}"><i class="fa-solid fa-shield-halved"></i> Audit Logs</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="admin-main">
+        <div style="margin-bottom: 2rem;">
+            <h1 class="section-title">Master Booking Register</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Inspect all online and walk-in cashier bookings across Ceylon Cineplex.</p>
+        </div>
+
+        <!-- Filter Bar -->
+        <div style="background: var(--bg-card); padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 2rem;">
+            <form method="GET" action="{{ url_for('admin.bookings') }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 100px; gap: 1rem; align-items: end;">
+                <div>
+                    <label class="form-label">Search Ref/Name/Phone</label>
+                    <input type="text" name="search" class="form-control" value="{{ search }}">
+                </div>
+                <div>
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-control">
+                        <option value="">All</option>
+                        <option value="CONFIRMED" {% if status == 'CONFIRMED' %}selected{% endif %}>CONFIRMED</option>
+                        <option value="CANCELLED" {% if status == 'CANCELLED' %}selected{% endif %}>CANCELLED</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">Source</label>
+                    <select name="source" class="form-control">
+                        <option value="">All</option>
+                        <option value="ONLINE" {% if source == 'ONLINE' %}selected{% endif %}>ONLINE</option>
+                        <option value="CASHIER" {% if source == 'CASHIER' %}selected{% endif %}>CASHIER</option>
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="btn-primary" style="width: 100%;">Search</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Bookings Table -->
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Ref</th>
+                        <th>Customer Name</th>
+                        <th>Movie</th>
+                        <th>Hall / Date</th>
+                        <th>Seats</th>
+                        <th>Amount</th>
+                        <th>Source</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in bookings %}
+                        <tr>
+                            <td><strong>{{ b.booking_ref }}</strong></td>
+                            <td>{{ b.customer_name }}<br/><span style="font-size: 0.75rem; color: var(--text-muted);">{{ b.customer_phone }}</span></td>
+                            <td>{{ b.movie_title }}</td>
+                            <td>{{ b.hall_name }}<br/><span style="font-size: 0.75rem; color: var(--text-muted);">{{ b.show_date }} {{ b.start_time[:5] }}</span></td>
+                            <td style="color: var(--gold); font-weight: bold;">{{ b.seats_str }}</td>
+                            <td style="font-weight: bold;">Rs. {{ "%.2f"|format(b.total_amount_lkr | float) }}</td>
+                            <td><span style="background: var(--bg-surface); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">{{ b.booking_source }}</span></td>
+                            <td>
+                                <span style="background: {% if b.booking_status == 'CONFIRMED' %}#1E4620{% else %}#450A0A{% endif %}; color: {% if b.booking_status == 'CONFIRMED' %}#A3E635{% else %}#FCA5A5{% endif %}; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+                                    {{ b.booking_status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('api.download_ticket_pdf', booking_id=b.id) }}" target="_blank" class="btn-outline" style="padding: 2px 8px; font-size: 0.75rem;">
+                                    <i class="fa-solid fa-file-pdf"></i> PDF
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

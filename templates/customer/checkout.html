@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section-container">
+    <h1 class="section-title" style="margin-bottom: 2rem;">Checkout & Mock Payment</h1>
+
+    <div class="checkout-grid">
+        
+        <!-- Left: Payment Form -->
+        <div style="background: var(--bg-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--border-color);">
+            <form action="{{ url_for('customer.process_payment') }}" method="POST" id="checkoutForm">
+                <input type="hidden" name="showtime_id" value="{{ showtime.id }}">
+                <input type="hidden" name="seat_ids" value="{{ seat_ids_str }}">
+
+                <!-- Step 1: Customer Info -->
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--gold); font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 1.2rem;">
+                        <i class="fa-solid fa-user"></i> 1. Contact Information
+                    </h3>
+
+                    <div class="form-row-2col">
+                        <div class="form-group">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" name="customer_name" class="form-control" value="{{ user_name }}" required placeholder="e.g. Kasun Perera">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number * (+94)</label>
+                            <input type="text" name="customer_phone" class="form-control" required placeholder="+94 77 123 4567">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Address (for E-Ticket) *</label>
+                        <input type="email" name="customer_email" class="form-control" value="{{ user_email }}" required placeholder="kasun@example.com">
+                    </div>
+                </div>
+
+                <!-- Step 2: Payment Method -->
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--gold); font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.5rem; margin-bottom: 1.2rem;">
+                        <i class="fa-solid fa-credit-card"></i> 2. Payment Method
+                    </h3>
+
+                    <div class="checkout-payment-methods">
+                        <label style="flex: 1; background: var(--bg-surface); padding: 1rem; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                            <input type="radio" name="payment_method" value="Credit Card" checked>
+                            <span><i class="fa-brands fa-cc-visa" style="color: #60A5FA;"></i> Credit/Debit Card</span>
+                        </label>
+
+                        <label style="flex: 1; background: var(--bg-surface); padding: 1rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                            <input type="radio" name="payment_method" value="Online Banking">
+                            <span><i class="fa-solid fa-building-columns" style="color: var(--gold);"></i> Online Payment</span>
+                        </label>
+
+                        <label style="flex: 1; background: var(--bg-surface); padding: 1rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                            <input type="radio" name="payment_method" value="Cash">
+                            <span><i class="fa-solid fa-money-bill-wave" style="color: #4ADE80;"></i> Pay at Counter</span>
+                        </label>
+                    </div>
+
+                    <!-- Card details mock fields -->
+                    <div id="cardFields" style="background: var(--bg-surface); padding: 1.2rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div class="form-group">
+                            <label class="form-label">Card Number (Mock Sandbox)</label>
+                            <input type="text" class="form-control" placeholder="4532 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 8892">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Expiry Date</label>
+                                <input type="text" class="form-control" placeholder="MM/YY">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">CVV</label>
+                                <input type="password" class="form-control" maxlength="4" placeholder="123">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; padding: 1rem; font-size: 1rem;">
+                    <i class="fa-solid fa-lock"></i> Pay Rs. {{ "%.2f"|format(total) }} & Confirm Booking
+                </button>
+            </form>
+        </div>
+
+        <!-- Right: Order Summary -->
+        <div>
+            <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); position: sticky; top: 100px;">
+                <h3 style="color: var(--gold); font-size: 1.2rem; margin-bottom: 1rem;">Order Summary</h3>
+
+                <div style="display: flex; gap: 12px; margin-bottom: 1.2rem; padding-bottom: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <img src="{{ showtime.poster_url }}" alt="{{ showtime.movie_title }}" style="width: 70px; height: 100px; object-fit: cover; border-radius: 4px;">
+                    <div>
+                        <h4 style="font-size: 1rem; font-weight: 700;">{{ showtime.movie_title }}</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">{{ showtime.language }} &bull; {{ showtime.duration_mins }}m</p>
+                        <p style="font-size: 0.85rem; color: var(--gold); margin-top: 4px;">{{ showtime.hall_name }}</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">{{ showtime.show_date }} at {{ showtime.start_time[:5] }}</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Seats Selected:</span>
+                    <div style="font-weight: 700; color: var(--text-primary); margin-top: 4px;">
+                        {% for s in selected_seats %}
+                            <span style="display: inline-block; background: var(--bg-surface); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border-color); font-size: 0.85rem; margin-right: 4px; margin-bottom: 4px;">
+                                {{ s.seat_number }} ({{ s.seat_type_name }})
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 1rem; font-size: 0.9rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Tickets Subtotal</span>
+                        <span>Rs. {{ "%.2f"|format(subtotal) }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--text-muted);">
+                        <span>Booking Fee</span>
+                        <span>Rs. {{ "%.2f"|format(booking_fee) }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 1.2rem; font-weight: 700; color: var(--gold);">
+                        <span>Total Payable</span>
+                        <span>Rs. {{ "%.2f"|format(total) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

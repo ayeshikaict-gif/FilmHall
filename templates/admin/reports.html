@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+        <ul class="sidebar-menu">
+            <li class="sidebar-item"><a href="{{ url_for('admin.dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.movies') }}"><i class="fa-solid fa-film"></i> Movies Management</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.showtimes') }}"><i class="fa-regular fa-calendar-days"></i> Showtimes Schedule</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.halls') }}"><i class="fa-solid fa-couch"></i> Halls & Pricing</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.bookings') }}"><i class="fa-solid fa-ticket"></i> Master Bookings</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.users') }}"><i class="fa-solid fa-users"></i> Users & Roles</a></li>
+            <li class="sidebar-item active"><a href="{{ url_for('admin.reports') }}"><i class="fa-solid fa-chart-pie"></i> Sales Reports</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.audit_logs') }}"><i class="fa-solid fa-shield-halved"></i> Audit Logs</a></li>
+        </ul>
+    </div>
+
+    <!-- Content -->
+    <div class="admin-main">
+        <div style="margin-bottom: 2rem;">
+            <h1 class="section-title">Sales & Financial Revenue Reports</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Daily revenue summaries and movie occupancy performance metrics.</p>
+        </div>
+
+        <!-- Daily Revenue Table -->
+        <h3 style="color: var(--gold); font-size: 1.1rem; margin-bottom: 1rem;"><i class="fa-solid fa-calendar-day"></i> Daily Revenue Breakdown</h3>
+        <div class="table-responsive" style="margin-bottom: 2.5rem;">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Sale Date</th>
+                        <th>Bookings Count</th>
+                        <th>Total Revenue (LKR)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in daily_sales %}
+                        <tr>
+                            <td><strong>{{ d.sale_date }}</strong></td>
+                            <td>{{ d.bookings_count }}</td>
+                            <td style="color: var(--gold); font-weight: bold; font-size: 1.05rem;">Rs. {{ "%.2f"|format(d.revenue | float) }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Movie Performance Table -->
+        <h3 style="color: var(--gold); font-size: 1.1rem; margin-bottom: 1rem;"><i class="fa-solid fa-film"></i> Lifetime Movie Box-Office Revenue</h3>
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Movie Title</th>
+                        <th>Total Bookings</th>
+                        <th>Seats Sold</th>
+                        <th>Gross Revenue (LKR)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ms in movie_stats %}
+                        <tr>
+                            <td><strong>{{ ms.title }}</strong></td>
+                            <td>{{ ms.total_bookings or 0 }}</td>
+                            <td>{{ ms.total_tickets or 0 }} Seats</td>
+                            <td style="color: var(--gold); font-weight: bold;">Rs. {{ "%.2f"|format((ms.total_revenue or 0) | float) }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

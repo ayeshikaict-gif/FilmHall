@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    
+    <!-- Sidebar Navigation -->
+    <div class="admin-sidebar">
+        <ul class="sidebar-menu">
+            <li class="sidebar-item active"><a href="{{ url_for('admin.dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.movies') }}"><i class="fa-solid fa-film"></i> Movies Management</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.showtimes') }}"><i class="fa-regular fa-calendar-days"></i> Showtimes Schedule</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.halls') }}"><i class="fa-solid fa-couch"></i> Halls & Pricing</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.bookings') }}"><i class="fa-solid fa-ticket"></i> Master Bookings</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.users') }}"><i class="fa-solid fa-users"></i> Users & Roles</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.reports') }}"><i class="fa-solid fa-chart-pie"></i> Sales Reports</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.audit_logs') }}"><i class="fa-solid fa-shield-halved"></i> Audit Logs</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Admin Dashboard Content -->
+    <div class="admin-main">
+        <div style="margin-bottom: 2rem;">
+            <h1 class="section-title">Cinema Executive Analytics</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Real-time performance overview of Ceylon Cineplex ticketing network.</p>
+        </div>
+
+        <!-- Key Metrics Cards -->
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-label">Today's Revenue</div>
+                <div class="stat-number" style="color: var(--gold);">Rs. {{ "%.2f"|format(today_revenue | default(0) | float) }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Today's Bookings</div>
+                <div class="stat-number">{{ today_bookings | default(0) }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Registered Customers</div>
+                <div class="stat-number">{{ total_customers | default(0) }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Now Showing Movies</div>
+                <div class="stat-number">{{ active_movies | default(0) }}</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid: Source Breakdown & Popular Movies -->
+        <div class="admin-dash-grid">
+            
+            <!-- Booking Source Distribution -->
+            <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                <h3 style="color: var(--gold); font-size: 1.1rem; margin-bottom: 1.2rem;"><i class="fa-solid fa-pie-chart"></i> Ticket Sales Source Breakdown</h3>
+                
+                {% for src in source_breakdown %}
+                    <div style="margin-bottom: 1.2rem;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 6px;">
+                            <span><strong>{{ src.booking_source }}</strong> ({{ src.count }} Bookings)</span>
+                            <span style="color: var(--gold);">Rs. {{ "%.2f"|format(src.total | default(0) | float) }}</span>
+                        </div>
+                        <div style="background: var(--bg-surface); height: 10px; border-radius: 5px; overflow: hidden;">
+                            <div style="background: {% if src.booking_source == 'ONLINE' %}var(--gold){% else %}var(--red-accent){% endif %}; height: 100%; width: {{ (src.count * 20) if src.count else 0 }}%;"></div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">No bookings recorded yet.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Top Popular Movies -->
+            <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                <h3 style="color: var(--gold); font-size: 1.1rem; margin-bottom: 1.2rem;"><i class="fa-solid fa-trophy"></i> Top Performing Movies</h3>
+                
+                <div class="table-responsive">
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th>Movie</th>
+                                <th>Tickets Sold</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pm in popular_movies %}
+                                <tr>
+                                    <td><strong>{{ pm.title }}</strong></td>
+                                    <td>{{ pm.tickets_sold }}</td>
+                                    <td style="color: var(--gold); font-weight: bold;">Rs. {{ "%.2f"|format(pm.revenue | default(0) | float) }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" style="text-align: center; color: var(--text-muted);">No sales data available.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Audit Logs Preview -->
+        <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+            <h3 style="color: var(--gold); font-size: 1.1rem; margin-bottom: 1rem;"><i class="fa-solid fa-shield-halved"></i> Recent Administrative Audit Logs</h3>
+
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                            <th>IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in recent_logs %}
+                            <tr>
+                                <td style="font-size: 0.8rem; color: var(--text-muted);">{{ log.created_at }}</td>
+                                <td>{{ log.full_name or 'System' }} ({{ log.role_name or 'N/A' }})</td>
+                                <td><span style="background: var(--bg-surface); padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem;">{{ log.action }}</span></td>
+                                <td style="font-size: 0.85rem;">{{ log.details }}</td>
+                                <td style="font-size: 0.8rem; color: var(--text-muted);">{{ log.ip_address or '127.0.0.1' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

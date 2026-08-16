@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang | lower }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ cinema_name }} - {{ cinema_tagline }}</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Core Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Header / Navigation -->
+    <nav class="navbar">
+        <div class="brand-container">
+            <a href="{{ url_for('customer.index') }}" style="display: flex; align-items: center; gap: 12px;">
+                <div class="brand-logo">CC</div>
+                <div class="brand-title">CEYLON <span>CINEPLEX</span></div>
+            </a>
+        </div>
+
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="nav-wrapper" id="navWrapper">
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('customer.index') }}" class="nav-link" data-si="Home">Home</a></li>
+                <li><a href="{{ url_for('customer.movies') }}" class="nav-link" data-si="Movies">Movies</a></li>
+
+                {% if session.user_id %}
+                    {% if session.user_role == 'ADMIN' %}
+                        <li><a href="{{ url_for('admin.dashboard') }}" class="nav-link" style="color: var(--gold);" data-si="Admin Dashboard"><i class="fa-solid fa-gauge"></i> Admin</a></li>
+                    {% elif session.user_role == 'CASHIER' %}
+                        <li><a href="{{ url_for('cashier.dashboard') }}" class="nav-link" style="color: var(--gold);" data-si="Cashier POS"><i class="fa-solid fa-cash-register"></i> POS Counter</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('customer.my_bookings') }}" class="nav-link" data-si="My Bookings">My Bookings</a></li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+
+            <div class="nav-actions">
+                {% if session.user_id %}
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <a href="{{ url_for('customer.profile') }}" style="color: var(--text-primary); font-size: 0.9rem;">
+                            <i class="fa-solid fa-circle-user" style="color: var(--gold);"></i> {{ session.user_name }}
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Logout</a>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn-outline">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn-primary">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages Container -->
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <span>{{ message }}</span>
+                        <button onclick="this.parentElement.remove()" style="background:none; border:none; color:inherit; cursor:pointer; font-size:1.1rem;">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main style="flex-grow: 1;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <h4>Ceylon Cineplex</h4>
+                <p>{{ cinema_tagline }}</p>
+                <p style="margin-top: 10px;"><i class="fa-solid fa-location-dot" style="color: var(--gold);"></i> {{ cinema_address }}</p>
+                <p><i class="fa-solid fa-phone" style="color: var(--gold);"></i> {{ cinema_phone }}</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <li><a href="{{ url_for('customer.movies', status='NOW SHOWING') }}">Now Showing Movies</a></li>
+                <li><a href="{{ url_for('customer.movies', status='COMING SOON') }}">Coming Soon</a></li>
+                <li><a href="{{ url_for('customer.movies', language='Sinhala') }}">Sinhala Cinema</a></li>
+            </div>
+            <div class="footer-col">
+                <h4>Cinema Experience</h4>
+                <p>Enjoy Dolby Atmos 7.1 Surround Sound, 4K Laser Projection, and VIP Luxury Recliner seats at Sri Lanka's finest movie hall.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 {{ cinema_name }}. All Rights Reserved. Designed for Sri Lankan Cinema Enthusiasts.
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

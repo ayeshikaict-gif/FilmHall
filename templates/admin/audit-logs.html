@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+        <ul class="sidebar-menu">
+            <li class="sidebar-item"><a href="{{ url_for('admin.dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.movies') }}"><i class="fa-solid fa-film"></i> Movies Management</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.showtimes') }}"><i class="fa-regular fa-calendar-days"></i> Showtimes Schedule</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.halls') }}"><i class="fa-solid fa-couch"></i> Halls & Pricing</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.bookings') }}"><i class="fa-solid fa-ticket"></i> Master Bookings</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.users') }}"><i class="fa-solid fa-users"></i> Users & Roles</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.reports') }}"><i class="fa-solid fa-chart-pie"></i> Sales Reports</a></li>
+            <li class="sidebar-item active"><a href="{{ url_for('admin.audit_logs') }}"><i class="fa-solid fa-shield-halved"></i> Audit Logs</a></li>
+        </ul>
+    </div>
+
+    <!-- Content -->
+    <div class="admin-main">
+        <div style="margin-bottom: 2rem;">
+            <h1 class="section-title">System Audit Log Trail</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Security logging feed of administrative actions, pricing modifications, and logins.</p>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                        <th>Details</th>
+                        <th>IP Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                        <tr>
+                            <td style="font-size: 0.8rem; color: var(--text-muted);">{{ log.created_at }}</td>
+                            <td><strong>{{ log.full_name or 'System/Guest' }}</strong><br/><span style="font-size: 0.75rem; color: var(--text-muted);">{{ log.email or '' }}</span></td>
+                            <td><span style="background: var(--bg-surface); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">{{ log.role_name or 'SYSTEM' }}</span></td>
+                            <td><span style="background: #0C4A6E; color: #7DD3FC; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem;">{{ log.action }}</span></td>
+                            <td style="font-size: 0.85rem;">{{ log.details }}</td>
+                            <td style="font-size: 0.8rem; color: var(--text-muted);">{{ log.ip_address or '127.0.0.1' }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

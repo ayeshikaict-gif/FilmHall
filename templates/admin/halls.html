@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+        <ul class="sidebar-menu">
+            <li class="sidebar-item"><a href="{{ url_for('admin.dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.movies') }}"><i class="fa-solid fa-film"></i> Movies Management</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.showtimes') }}"><i class="fa-regular fa-calendar-days"></i> Showtimes Schedule</a></li>
+            <li class="sidebar-item active"><a href="{{ url_for('admin.halls') }}"><i class="fa-solid fa-couch"></i> Halls & Pricing</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.bookings') }}"><i class="fa-solid fa-ticket"></i> Master Bookings</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.users') }}"><i class="fa-solid fa-users"></i> Users & Roles</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.reports') }}"><i class="fa-solid fa-chart-pie"></i> Sales Reports</a></li>
+            <li class="sidebar-item"><a href="{{ url_for('admin.audit_logs') }}"><i class="fa-solid fa-shield-halved"></i> Audit Logs</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="admin-main">
+        <div style="margin-bottom: 2rem;">
+            <h1 class="section-title">Halls & Seat Pricing Tiers</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Configure cinema hall seat capacity and base ticket prices in LKR.</p>
+        </div>
+
+        <!-- Halls List -->
+        <h3 style="color: var(--gold); font-size: 1.1rem; margin-bottom: 1rem;"><i class="fa-solid fa-house-laptop"></i> Active Cinema Halls</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+            {% for h in halls %}
+                <div style="background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); padding: 1.5rem;">
+                    <h3 style="font-size: 1.3rem; color: var(--gold); margin-bottom: 4px;">{{ h.name }}</h3>
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">{{ h.hall_type }}</div>
+                    
+                    <div style="font-size: 0.85rem; line-height: 1.8;">
+                        <div><strong>Total Capacity:</strong> {{ h.capacity }} Seats</div>
+                        <div><strong>Layout Dimensions:</strong> {{ h.rows_count }} Rows x {{ h.cols_count }} Columns</div>
+                        <div><strong>Status:</strong> <span style="color: #22C55E; font-weight: bold;">Active</span></div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Seat Pricing Management -->
+        <h3 style="color: var(--gold); font-size: 1.1rem; margin-bottom: 1rem;"><i class="fa-solid fa-tags"></i> Dynamic Seat Price Tiers (LKR)</h3>
+        <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Tier Name</th>
+                            <th>Current Price (LKR)</th>
+                            <th>Description</th>
+                            <th>Update Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for st in seat_types %}
+                            <tr>
+                                <td><strong>{{ st.name }}</strong></td>
+                                <td style="color: var(--gold); font-weight: bold; font-size: 1.1rem;">Rs. {{ "%.2f"|format(st.base_price_lkr | float) }}</td>
+                                <td style="color: var(--text-muted); font-size: 0.85rem;">{{ st.description }}</td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('admin.halls') }}" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                        <input type="hidden" name="seat_type_id" value="{{ st.id }}">
+                                        <input type="number" step="50" name="price_lkr" value="{{ st.base_price_lkr }}" class="form-control" style="width: 110px; padding: 4px 8px;" required>
+                                        <button type="submit" class="btn-primary" style="padding: 4px 10px; font-size: 0.75rem;">Update</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

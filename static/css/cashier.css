@@ -1,0 +1,36 @@
+/* Cashier POS Theme */
+.pos-container {
+    display: grid;
+    grid-template-columns: 320px 1fr 340px;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    min-height: calc(100vh - 70px);
+}
+
+.pos-panel {
+    background: var(--bg-card);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.pos-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.pos-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gold);
+    text-transform: uppercase;
+}
+
+@media (max-width: 1024px) {
+    .pos-container {
+        grid-template-columns: 1fr;
+    }
+}

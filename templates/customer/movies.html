@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section-container">
+    <div style="margin-bottom: 2rem;">
+        <h1 class="section-title">Explore Cinema Collection</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 5px;">Discover Sinhala masterpieces and global blockbusters playing at Ceylon Cineplex.</p>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div style="background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 2.5rem;">
+        <form method="GET" action="{{ url_for('customer.movies') }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 120px; gap: 1rem; align-items: end;">
+            <div>
+                <label class="form-label"><i class="fa-solid fa-magnifying-glass"></i> Search Title/Cast</label>
+                <input type="text" name="search" class="form-control" placeholder="Search movies..." value="{{ search }}">
+            </div>
+            <div>
+                <label class="form-label"><i class="fa-solid fa-film"></i> Genre</label>
+                <select name="genre" class="form-control">
+                    <option value="">All Genres</option>
+                    <option value="Action" {% if genre == 'Action' %}selected{% endif %}>Action</option>
+                    <option value="Drama" {% if genre == 'Drama' %}selected{% endif %}>Drama</option>
+                    <option value="Comedy" {% if genre == 'Comedy' %}selected{% endif %}>Comedy</option>
+                    <option value="Sci-Fi" {% if genre == 'Sci-Fi' %}selected{% endif %}>Sci-Fi</option>
+                    <option value="Biography" {% if genre == 'Biography' %}selected{% endif %}>Biography</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label"><i class="fa-solid fa-language"></i> Language</label>
+                <select name="language" class="form-control">
+                    <option value="">All Languages</option>
+                    <option value="Sinhala" {% if language == 'Sinhala' %}selected{% endif %}>Sinhala</option>
+                    <option value="English" {% if language == 'English' %}selected{% endif %}>English</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label"><i class="fa-solid fa-filter"></i> Status</label>
+                <select name="status" class="form-control">
+                    <option value="">All Statuses</option>
+                    <option value="NOW SHOWING" {% if status == 'NOW SHOWING' %}selected{% endif %}>Now Showing</option>
+                    <option value="COMING SOON" {% if status == 'COMING SOON' %}selected{% endif %}>Coming Soon</option>
+                </select>
+            </div>
+            <div>
+                <button type="submit" class="btn-primary" style="width: 100%;">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Movie Grid -->
+    {% if movies %}
+        <div class="movie-grid">
+            {% for movie in movies %}
+                <div class="movie-card">
+                    <div class="movie-poster-wrap">
+                        <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy">
+                        <span class="status-badge">{{ movie.status }}</span>
+                    </div>
+                    <div class="movie-info">
+                        <h3 class="movie-card-title">{{ movie.title }}</h3>
+                        <div class="movie-card-meta">
+                            <span>{{ movie.genre }}</span>
+                            <span>{{ movie.duration_mins }}m</span>
+                        </div>
+                        <a href="{{ url_for('customer.movie_details', movie_id=movie.id) }}" class="btn-primary movie-card-btn">Book / Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 4rem 2rem; background: var(--bg-card); border-radius: 8px; border: 1px dashed var(--border-color);">
+            <i class="fa-solid fa-film" style="font-size: 3rem; color: var(--gold); margin-bottom: 1rem;"></i>
+            <h3>No movies found</h3>
+            <p style="color: var(--text-muted); margin-top: 5px;">Try adjusting your search query or filters.</p>
+            <a href="{{ url_for('customer.movies') }}" class="btn-outline" style="margin-top: 1.5rem; display: inline-block;">Reset Filters</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

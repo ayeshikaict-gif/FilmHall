@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section-container">
+    <div style="margin-bottom: 2rem;">
+        <h1 class="section-title">My Booking History</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 5px;">Manage your cinema tickets and download official PDF passes.</p>
+    </div>
+
+    {% if bookings %}
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% for b in bookings %}
+                <div style="background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+                    
+                    <div style="display: flex; gap: 1.2rem; align-items: center;">
+                        <img src="{{ b.poster_url }}" alt="{{ b.movie_title }}" style="width: 70px; height: 100px; object-fit: cover; border-radius: 6px;">
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--gold); font-weight: bold;">REF: {{ b.booking_ref }}</span>
+                            <h3 style="font-size: 1.3rem; margin-top: 2px;">{{ b.movie_title }}</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                                <i class="fa-regular fa-calendar"></i> {{ b.show_date }} at {{ b.start_time[:5] }} &bull; {{ b.hall_name }}
+                            </p>
+                            <p style="font-size: 0.85rem; color: var(--text-primary); margin-top: 4px;">
+                                Seats: <strong>{{ b.seats_str }}</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                        <span style="font-size: 1.2rem; font-weight: 700; color: var(--gold);">Rs. {{ "%.2f"|format(b.total_amount_lkr | float) }}</span>
+                        <span style="display: inline-block; background: {% if b.booking_status == 'CONFIRMED' %}#1E4620{% else %}#450A0A{% endif %}; color: {% if b.booking_status == 'CONFIRMED' %}#A3E635{% else %}#FCA5A5{% endif %}; font-size: 0.75rem; font-weight: bold; padding: 2px 10px; border-radius: 12px;">
+                            {{ b.booking_status }}
+                        </span>
+                        
+                        <a href="{{ url_for('api.download_ticket_pdf', booking_id=b.id) }}" target="_blank" class="btn-outline" style="padding: 0.4rem 0.9rem; font-size: 0.8rem; margin-top: 4px;">
+                            <i class="fa-solid fa-file-pdf"></i> Download PDF
+                        </a>
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 4rem 2rem; background: var(--bg-card); border-radius: 8px; border: 1px dashed var(--border-color);">
+            <i class="fa-solid fa-ticket" style="font-size: 3rem; color: var(--gold); margin-bottom: 1rem;"></i>
+            <h3>No Bookings Found</h3>
+            <p style="color: var(--text-muted); margin-top: 5px;">You have not booked any movie tickets yet.</p>
+            <a href="{{ url_for('customer.movies') }}" class="btn-primary" style="margin-top: 1.5rem; display: inline-block;">Browse Movies & Book Now</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

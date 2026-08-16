@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+        <div>
+            <h1 class="section-title" data-si="Select Seats">Select Your Cinema Seats</h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 5px;">
+                <strong>{{ showtime.movie_title }}</strong> &bull; {{ showtime.hall_name }} &bull; {{ showtime.show_date }} at {{ showtime.start_time[:5] }}
+            </p>
+        </div>
+
+        <div id="timerDisplay" style="display: none; background: #451A03; color: #FDE047; border: 1px solid #F59E0B; padding: 0.6rem 1.2rem; border-radius: 30px; font-weight: 700; font-size: 0.9rem;">
+            Seats Reserved For: 05:00
+        </div>
+    </div>
+
+    <!-- Seat Map Container -->
+    <div class="seat-map-container">
+        <input type="hidden" id="showtimeId" value="{{ showtime.id }}">
+
+        <!-- Screen Bar -->
+        <div class="screen-indicator">
+            <span class="screen-text">CINEMA SCREEN THIS WAY</span>
+        </div>
+
+        <!-- Legend -->
+        <div class="seat-legend">
+            <div class="legend-item"><div class="seat-sample available"></div> Available</div>
+            <div class="legend-item"><div class="seat-sample selected"></div> Selected</div>
+            <div class="legend-item"><div class="seat-sample booked"></div> Booked</div>
+            <div class="legend-item"><div class="seat-sample held"></div> Reserved / On Hold</div>
+            <div class="legend-item"><div class="seat-sample vip"></div> VIP Tier</div>
+        </div>
+
+        <!-- Seat Grid -->
+        <div class="seat-grid-scroll-wrap">
+            <div id="seatGrid" class="seat-grid">
+                {% set current_row = namespace(label='') %}
+                {% for s in seat_map %}
+                    {% if s.row_label != current_row.label %}
+                        {% if not loop.first %}</div>{% endif %}
+                        <div class="seat-row">
+                            <span class="row-label">{{ s.row_label }}</span>
+                        {% set current_row.label = s.row_label %}
+                    {% endif %}
+
+                    <button class="seat-btn {% if s.status == 'BOOKED' %}booked{% elif s.status == 'HELD' %}held{% elif s.status == 'SELECTED' %}selected{% elif s.seat_type_name == 'VIP' %}seat-vip{% endif %}"
+                            data-seat-id="{{ s.seat_id }}"
+                            data-seat-num="{{ s.seat_number }}"
+                            data-price="{{ s.base_price_lkr }}"
+                            title="{{ s.seat_number }} - {{ s.seat_type_name }} (Rs. {{ s.base_price_lkr }})">
+                        {{ s.col_number }}
+                    </button>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Legend Info -->
+        <div style="display: flex; gap: 1.5rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-muted);">
+            {% for st in seat_types %}
+                <span><i class="fa-solid fa-tag" style="color: var(--gold);"></i> {{ st.name }}: <strong>Rs. {{ st.base_price_lkr | float | round(2) }}</strong></span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Booking Summary Bottom Bar -->
+    <div style="margin-top: 2rem;">
+        <form action="{{ url_for('customer.checkout') }}" method="POST">
+            <input type="hidden" name="showtime_id" value="{{ showtime.id }}">
+            <input type="hidden" name="seat_ids" id="seatIdsInput">
+
+            <div class="booking-summary-bar">
+                <div>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); display: block;">Selected Seats</span>
+                    <strong id="selectedSeatsText" style="font-size: 1.1rem; color: var(--gold);">None</strong>
+                </div>
+
+                <div>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); display: block;">Tickets</span>
+                    <strong id="ticketCountText" style="font-size: 1.1rem;">0</strong>
+                </div>
+
+                <div>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); display: block;">Subtotal</span>
+                    <span id="subtotalText" style="font-size: 1.1rem;">Rs. 0.00</span>
+                </div>
+
+                <div>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); display: block;">Total Amount (inc. LKR 50 Fee)</span>
+                    <strong id="totalAmountText" style="font-size: 1.3rem; color: var(--gold);">Rs. 0.00</strong>
+                </div>
+
+                <div>
+                    <button type="submit" id="proceedBtn" class="btn-primary" disabled>
+                        Proceed to Checkout <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/seat-selection.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section-container" style="max-width: 500px; margin: 2rem auto;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="font-family: var(--font-heading); font-size: 2rem; color: var(--gold);">Create Customer Account</h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Join Ceylon Cineplex for seamless movie ticket booking.</p>
+    </div>
+
+    <div style="background: var(--bg-card); padding: 2rem; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <form method="POST" action="{{ url_for('auth.register') }}">
+            <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" name="full_name" class="form-control" required placeholder="e.g. Kasun Perera">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email Address *</label>
+                <input type="email" name="email" class="form-control" required placeholder="kasun.perera@gmail.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Phone Number (+94) *</label>
+                <input type="text" name="phone" class="form-control" required placeholder="+94 77 123 4567">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">Password *</label>
+                    <input type="password" name="password" class="form-control" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm Password *</label>
+                    <input type="password" name="confirm_password" class="form-control" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; padding: 0.8rem; margin-top: 1rem; font-size: 0.95rem;">
+                <i class="fa-solid fa-user-plus"></i> Create Account
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">
+            Already registered? <a href="{{ url_for('auth.login') }}" style="color: var(--gold); font-weight: bold;">Log In</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

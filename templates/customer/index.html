@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Cinema Experience Hero Section -->
+<section class="hero-section" style="background-image: url('{{ url_for('static', filename='images/cinema_hero.jpg') }}');">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <span class="hero-badge"><i class="fa-solid fa-crown"></i> CEYLON CINEPLEX PREMIERE CINEMA</span>
+        <h1 class="hero-title">Experience Movies Like Never Before</h1>
+
+        <p class="hero-description">Colombo's ultimate cinema destination. Enjoy Sri Lankan cinematic masterpieces and international blockbusters with luxury comfort, state-of-the-art projection, and immersive sound.</p>
+
+        <div class="hero-buttons">
+            <a href="#now-showing" class="btn-primary"><i class="fa-solid fa-ticket"></i> Book Movie Tickets</a>
+            <a href="#cinema-halls" class="btn-outline"><i class="fa-solid fa-couch"></i> Explore Cinema Halls</a>
+        </div>
+    </div>
+</section>
+
+<!-- Now Showing Section -->
+<section class="section-container" id="now-showing">
+    <div class="section-header">
+        <h2 class="section-title">Now Showing in Colombo</h2>
+        <a href="{{ url_for('customer.movies', status='NOW SHOWING') }}" class="btn-outline" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;">View All</a>
+    </div>
+
+    <div class="movie-grid">
+        {% for movie in now_showing %}
+            <div class="movie-card">
+                <div class="movie-poster-wrap">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy">
+                    <span class="status-badge">NOW SHOWING</span>
+                </div>
+                <div class="movie-info">
+                    <h3 class="movie-card-title">{{ movie.title }}</h3>
+                    <div class="movie-card-meta">
+                        <span><i class="fa-regular fa-clock"></i> {{ movie.duration_mins }}m</span>
+                        <span><i class="fa-solid fa-globe"></i> {{ movie.language }}</span>
+                    </div>
+                    <a href="{{ url_for('customer.movie_details', movie_id=movie.id) }}" class="btn-primary movie-card-btn">Book Tickets</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Sinhala Movies Spotlight -->
+<section class="section-container" style="background: var(--bg-card); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+    <div class="section-header">
+        <div>
+            <h2 class="section-title">Sinhala Cinema Spotlight</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Celebrate authentic Sri Lankan storytelling and cinematic excellence.</p>
+        </div>
+        <a href="{{ url_for('customer.movies', language='Sinhala') }}" class="btn-outline" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;">Explore Sinhala Films</a>
+    </div>
+
+    <div class="movie-grid">
+        {% for movie in sinhala_movies %}
+            <div class="movie-card">
+                <div class="movie-poster-wrap">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy">
+                    <span class="status-badge" style="border-color: var(--gold);">SRI LANKA</span>
+                </div>
+                <div class="movie-info">
+                    <h3 class="movie-card-title">{{ movie.title }}</h3>
+                    <div class="movie-card-meta">
+                        <span>{{ movie.genre }}</span>
+                        <span>{{ movie.duration_mins }}m</span>
+                    </div>
+                    <a href="{{ url_for('customer.movie_details', movie_id=movie.id) }}" class="btn-outline movie-card-btn">View Details & Showtimes</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Coming Soon Section -->
+<section class="section-container">
+    <div class="section-header">
+        <h2 class="section-title">Coming Soon</h2>
+        <a href="{{ url_for('customer.movies', status='COMING SOON') }}" class="btn-outline" style="padding: 0.4rem 0.9rem; font-size: 0.8rem;">View All</a>
+    </div>
+
+    <div class="movie-grid">
+        {% for movie in coming_soon %}
+            <div class="movie-card">
+                <div class="movie-poster-wrap">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster" loading="lazy">
+                    <span class="status-badge" style="color: #60A5FA;">COMING SOON</span>
+                </div>
+                <div class="movie-info">
+                    <h3 class="movie-card-title">{{ movie.title }}</h3>
+                    <div class="movie-card-meta">
+                        <span>Release: {{ movie.release_date or 'TBA' }}</span>
+                    </div>
+                    <a href="{{ url_for('customer.movie_details', movie_id=movie.id) }}" class="btn-outline movie-card-btn">View Details</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Cinema Halls & Premium Technology Section -->
+<section class="section-container" id="cinema-halls" style="background: var(--bg-card); border-top: 1px solid var(--border-color);">
+    <div class="section-header">
+        <div>
+            <h2 class="section-title">Our World-Class Cinema Halls</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">State-of-the-art projection and seating designed for cinematic perfection.</p>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+        <!-- Hall 01 -->
+        <div style="background: var(--bg-dark); padding: 1.8rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: left;">
+            <div style="color: var(--gold); font-size: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-film"></i></div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Hall 01 (Standard Hall)</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">120 Ergonomic Comfort Seats featuring 4K Digital Projection & Dolby Surround sound system.</p>
+            <ul style="list-style: none; padding: 0; font-size: 0.85rem; color: #BBB; line-height: 1.8;">
+                <li><i class="fa-solid fa-check" style="color: var(--gold); margin-right: 8px;"></i> Capacity: 120 Seats (10 Rows x 12 Cols)</li>
+                <li><i class="fa-solid fa-check" style="color: var(--gold); margin-right: 8px;"></i> Standard Seat Price: LKR 850</li>
+                <li><i class="fa-solid fa-check" style="color: var(--gold); margin-right: 8px;"></i> Sound: Dolby Surround 5.1</li>
+            </ul>
+        </div>
+
+        <!-- Hall 02 -->
+        <div style="background: var(--bg-dark); padding: 1.8rem; border-radius: 8px; border: 1px solid var(--gold); text-align: left; position: relative;">
+            <span style="position: absolute; top: -12px; right: 15px; background: var(--gold); color: #000; font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; text-transform: uppercase;">POPULAR</span>
+            <div style="color: var(--gold); font-size: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-volume-high"></i></div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Hall 02 (Dolby Atmos)</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">80 Premium Seats with 3D Spatial Audio & extra legroom for maximum immersion.</p>
+            <ul style="list-style: none; padding: 0; font-size: 0.85rem; color: #BBB; line-height: 1.8;">
+                <li><i class="fa-solid fa-check" style="color: var(--gold); margin-right: 8px;"></i> Capacity: 80 Seats (8 Rows x 10 Cols)</li>
+                <li><i class="fa-solid fa-check" style="color: var(--gold); margin-right: 8px;"></i> Premium Seat Price: LKR 1,200</li>
+                <li><i class="fa-solid fa-check" style="color: var(--gold); margin-right: 8px;"></i> Sound: Dolby Atmos 7.1 Surround</li>
+            </ul>
+        </div>
+
+        <!-- Hall 03 -->
+        <div style="background: var(--bg-dark); padding: 1.8rem; border-radius: 8px; border: 1px solid var(--burgundy); text-align: left;">
+            <div style="color: var(--red-accent); font-size: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-couch"></i></div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Hall 03 (VIP Recliner Hall)</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">50 Motorized Luxury Recliners with complimentary popcorn, drinks, and dedicated butler service.</p>
+            <ul style="list-style: none; padding: 0; font-size: 0.85rem; color: #BBB; line-height: 1.8;">
+                <li><i class="fa-solid fa-check" style="color: var(--gold); margin-right: 8px;"></i> Capacity: 50 VIP Recliners (5 Rows x 10 Cols)</li>
+                <li><i class="fa-solid fa-check" style="color: var(--gold); margin-right: 8px;"></i> VIP Recliner Price: LKR 1,800</li>
+                <li><i class="fa-solid fa-check" style="color: var(--gold); margin-right: 8px;"></i> Complimentary Popcorn & Beverage Service</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
